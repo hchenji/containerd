@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -35,9 +34,9 @@ import (
 	"github.com/containerd/containerd/mount"
 	"github.com/containerd/containerd/runtime/proc"
 	"github.com/containerd/fifo"
-	runc "github.com/containerd/go-runc"
+	"github.com/containerd/go-runc"
 	google_protobuf "github.com/gogo/protobuf/types"
-	specs "github.com/opencontainers/runtime-spec/specs-go"
+	"github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
 )
 
@@ -428,7 +427,7 @@ func (p *Init) checkpoint(ctx context.Context, r *CheckpointConfig) error {
 		actions = append(actions, runc.LeaveRunning)
 	}
 	work := filepath.Join(p.WorkDir, "criu-work")
-	defer os.RemoveAll(work)
+	//defer os.RemoveAll(work)
 	if err := p.runtime.Checkpoint(ctx, p.id, &runc.CheckpointOpts{
 		WorkDir:                  work,
 		ImagePath:                r.Path,
@@ -437,13 +436,15 @@ func (p *Init) checkpoint(ctx context.Context, r *CheckpointConfig) error {
 		AllowTerminal:            r.AllowTerminal,
 		FileLocks:                r.FileLocks,
 		EmptyNamespaces:          r.EmptyNamespaces,
-	}, actions...); err != nil {
+	}, actions...) {
 		dumpLog := filepath.Join(p.Bundle, "criu-dump.log")
 		if cerr := copyFile(dumpLog, filepath.Join(work, "dump.log")); cerr != nil {
 			log.G(ctx).Error(err)
 		}
 		return fmt.Errorf("%s path= %s", criuError(err), dumpLog)
 	}
+
+	
 	return nil
 }
 
