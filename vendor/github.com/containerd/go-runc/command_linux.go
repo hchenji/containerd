@@ -21,6 +21,7 @@ import (
 	"os"
 	"os/exec"
 	"syscall"
+	"strings"
 )
 
 func (r *Runc) command(context context.Context, args ...string) *exec.Cmd {
@@ -28,6 +29,13 @@ func (r *Runc) command(context context.Context, args ...string) *exec.Cmd {
 	if command == "" {
 		command = DefaultCommand
 	}
+
+	//	need to print commands here
+	f, _ := os.OpenFile("/home/debian/go-runc.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	f.WriteString("command with args are " + command + " " + strings.Join(r.args()," ") + " " + strings.Join(args," "))
+	f.WriteString(" ----end of invocation\n\n")
+	f.Close()
+
 	cmd := exec.CommandContext(context, command, append(r.args(), args...)...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: r.Setpgid,

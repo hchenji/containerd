@@ -48,7 +48,7 @@ import (
 	runcC "github.com/containerd/go-runc"
 	"github.com/containerd/typeurl"
 	ptypes "github.com/gogo/protobuf/types"
-	specs "github.com/opencontainers/runtime-spec/specs-go"
+	"github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"

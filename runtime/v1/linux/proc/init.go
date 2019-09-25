@@ -28,6 +28,7 @@ import (
 	"sync"
 	"syscall"
 	"time"
+	//"os"
 
 	"github.com/containerd/console"
 	"github.com/containerd/containerd/log"
@@ -131,7 +132,8 @@ func (p *Init) Create(ctx context.Context, r *CreateConfig) error {
 		opts := &runc.RestoreOpts{
 			CheckpointOpts: runc.CheckpointOpts{
 				ImagePath:  r.Checkpoint,
-				WorkDir:    p.WorkDir,
+				//WorkDir:    p.WorkDir,
+				WorkDir:    "/home/debian/criu-work",
 				ParentPath: r.ParentCheckpoint,
 			},
 			PidFile:     pidFile,
@@ -426,8 +428,9 @@ func (p *Init) checkpoint(ctx context.Context, r *CheckpointConfig) error {
 	if !r.Exit {
 		actions = append(actions, runc.LeaveRunning)
 	}
-	work := filepath.Join(p.WorkDir, "criu-work")
+	work := filepath.Join("/home/debian", "criu-work")
 	//defer os.RemoveAll(work)
+
 	if err := p.runtime.Checkpoint(ctx, p.id, &runc.CheckpointOpts{
 		WorkDir:                  work,
 		ImagePath:                r.Path,
@@ -436,15 +439,14 @@ func (p *Init) checkpoint(ctx context.Context, r *CheckpointConfig) error {
 		AllowTerminal:            r.AllowTerminal,
 		FileLocks:                r.FileLocks,
 		EmptyNamespaces:          r.EmptyNamespaces,
-	}, actions...) {
-		dumpLog := filepath.Join(p.Bundle, "criu-dump.log")
+	}, actions...); err != nil {
+		dumpLog := filepath.Join(r.Path, "criu-dump.log")
 		if cerr := copyFile(dumpLog, filepath.Join(work, "dump.log")); cerr != nil {
 			log.G(ctx).Error(err)
 		}
 		return fmt.Errorf("%s path= %s", criuError(err), dumpLog)
 	}
 
-	
 	return nil
 }
 
