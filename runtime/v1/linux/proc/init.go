@@ -128,12 +128,20 @@ func (p *Init) Create(ctx context.Context, r *CreateConfig) error {
 		}
 	}
 	pidFile := filepath.Join(p.Bundle, InitPidFile)
+
+
 	if r.Checkpoint != "" {
+		//now := time.Now()
+		//nanos := now.UnixNano()
+		//millis := nanos / 1000000
+		//work := filepath.Join("/home/debian/criu-work", "rt-" + strconv.FormatInt(millis, 10))
+		work := "/home/debian/criu-work"
+
 		opts := &runc.RestoreOpts{
 			CheckpointOpts: runc.CheckpointOpts{
 				ImagePath:  r.Checkpoint,
 				//WorkDir:    p.WorkDir,
-				WorkDir:    "/home/debian/criu-work",
+				WorkDir:    work,
 				ParentPath: r.ParentCheckpoint,
 			},
 			PidFile:     pidFile,
@@ -429,7 +437,13 @@ func (p *Init) checkpoint(ctx context.Context, r *CheckpointConfig) error {
 		actions = append(actions, runc.LeaveRunning)
 	}
 
-	work := filepath.Join("/home/debian/criu-work", filepath.Base(r.Path))
+	//now := time.Now()
+	//nanos := now.UnixNano()
+	//millis := nanos / 1000000
+	//work := filepath.Join("/home/debian/criu-work", "cp-" + strconv.FormatInt(millis, 10))
+
+	work := "/home/debian/criu-work"
+
 	//defer os.RemoveAll(work)
 
 	if err := p.runtime.Checkpoint(ctx, p.id, &runc.CheckpointOpts{
