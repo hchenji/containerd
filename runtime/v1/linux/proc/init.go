@@ -428,7 +428,8 @@ func (p *Init) checkpoint(ctx context.Context, r *CheckpointConfig) error {
 	if !r.Exit {
 		actions = append(actions, runc.LeaveRunning)
 	}
-	work := filepath.Join("/home/debian", "criu-work")
+
+	work := filepath.Join("/home/debian/criu-work", filepath.Base(r.Path))
 	//defer os.RemoveAll(work)
 
 	if err := p.runtime.Checkpoint(ctx, p.id, &runc.CheckpointOpts{
