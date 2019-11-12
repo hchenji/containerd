@@ -36,7 +36,13 @@ func (r *Runc) command(context context.Context, args ...string) *exec.Cmd {
 	nanos := now.UnixNano()
 	millis := nanos / 1000000
 	//	need to print commands here
-	f, _ := os.OpenFile("/home/debian/go-runc.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+
+	grunc := os.Getenv("GO_CRIU_RTXT")
+	if grunc == "" {
+		grunc = "/home/ubuntu/go-runc.txt"
+	}
+
+	f, _ := os.OpenFile(grunc, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	f.WriteString("at " + strconv.FormatInt(millis, 10) + " command with args are " + command + " " + strings.Join(r.args()," ") + " " + strings.Join(args," "))
 	f.WriteString(" ----end of invocation\n\n")
 	f.Close()

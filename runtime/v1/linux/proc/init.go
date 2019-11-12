@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -135,7 +136,11 @@ func (p *Init) Create(ctx context.Context, r *CreateConfig) error {
 		//nanos := now.UnixNano()
 		//millis := nanos / 1000000
 		//work := filepath.Join("/home/debian/criu-work", "rt-" + strconv.FormatInt(millis, 10))
-		work := "/home/debian/criu-work"
+
+		work := os.Getenv("GO_CRIU_WRKDIR")
+		if work == "" {
+			work = "/home/ubuntu/criu-work"
+		}
 
 		opts := &runc.RestoreOpts{
 			CheckpointOpts: runc.CheckpointOpts{
@@ -442,7 +447,10 @@ func (p *Init) checkpoint(ctx context.Context, r *CheckpointConfig) error {
 	//millis := nanos / 1000000
 	//work := filepath.Join("/home/debian/criu-work", "cp-" + strconv.FormatInt(millis, 10))
 
-	work := "/home/debian/criu-work"
+	work := os.Getenv("GO_CRIU_WRKDIR")
+	if work == "" {
+		work = "/home/ubuntu/criu-work"
+	}
 
 	//defer os.RemoveAll(work)
 
